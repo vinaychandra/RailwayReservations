@@ -136,10 +136,25 @@
   </div>
 </div>
 
+<div id="srcPop" style="z-index:500;position:absolute;display:none">
+  <table class="table table-condensed table-hover">
+    <tbody id="srcVals">
+    </tbody>
+  </table>
+</div>
+
+<div id="dstPop" style="z-index:500;position:absolute;display:none">
+  <table class="table table-condensed table-hover">
+    <tbody id="dstVals">
+    </tbody>
+  </table>
+</div>
+
 <%}%>
 </body>
 <script src="js/jquery-2.1.1.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
+<script src="js/searchbox.js"></script>
 <script>
   /*Code for ajax of train search*/
   function searchTrains()
@@ -193,5 +208,46 @@
               $('<form action="' + location + '" method="POST">' + form + '</form>').appendTo($(document.body)).submit();
             }
           });
+</script>
+
+<script>
+  $(document).ready(function() {
+    $("#source").popupDiv("#srcPop");
+    $("#srcPop").css("background-color","white");
+    $("#destination").popupDiv("#dstPop");
+    $("#dstPop").css("background-color","white");
+  });
+
+  jQuery.fn.popupDiv = function (divToPop) {
+    var pos=$(this).offset();
+    var h=$(this).height();
+    var w=$(this).width();
+
+    $(divToPop).css({ left: pos.left, top: pos.top + h + 10 });
+    $(divToPop).css("border-color","black");
+    $(divToPop).css("border-width","2px");
+
+    $(this).focusin(function(e) {
+      $(divToPop).css({ left: pos.left, top: pos.top + h + 10, width: w });
+        $(divToPop).show();
+    });
+    $(this).focusout(function(e) {
+      $(divToPop).css({ left: pos.left, top: pos.top + h + 10 });
+        $(divToPop).hide();
+    });
+  };
+
+  $("#source").searchbox({
+    url: 'placeSearch',
+    param: 'q',
+    dom_id: '#srcVals'
+  });
+
+  $("#destination").searchbox({
+    url: 'placeSearch',
+    param: 'q',
+    dom_id: '#dstVals'
+  });
+
 </script>
 </html>

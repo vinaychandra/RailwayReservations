@@ -35,6 +35,10 @@
         <servlet-name>signup</servlet-name>
         <servlet-class>RailwayReservation.signup</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>placeSearch</servlet-name>
+        <servlet-class>RailwayReservation.placeSearch</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>search</servlet-name>
         <url-pattern>/search</url-pattern>
@@ -66,5 +70,9 @@
     <servlet-mapping>
         <servlet-name>signup</servlet-name>
         <url-pattern>/signup</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>placeSearch</servlet-name>
+        <url-pattern>/placeSearch</url-pattern>
     </servlet-mapping>
 </web-app>

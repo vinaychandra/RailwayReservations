@@ -150,12 +150,36 @@
   </table>
 </div>
 
+<div class="modal fade" id="error-modal">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title">Error</h4>
+			</div>
+			<div class="modal-body" id="errVal">
+
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 <%}%>
 </body>
 <script src="js/jquery-2.1.1.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/searchbox.js"></script>
 <script>
+
+  function error(msg)
+  {
+    $("#error-modal").modal('toggle');
+    $("#errVal").html(msg);
+  }
+
   /*Code for ajax of train search*/
   function searchTrains()
   {
@@ -166,6 +190,9 @@
             date: $("#doj").val()
           },
           function(data){
+            if(data == ""){
+              error("No trains found!");
+            }
             $("#trainTable").html(data);
           });
   }

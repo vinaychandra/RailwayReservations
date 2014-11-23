@@ -12,6 +12,8 @@ CREATE TABLE "station" (
   "name" TEXT NOT NULL
 );
 
+CREATE INDEX "idx_station__id" ON "station" ("id");
+
 CREATE TABLE "faretable" (
   "station1" TEXT NOT NULL,
   "station2" TEXT NOT NULL,
@@ -19,7 +21,7 @@ CREATE TABLE "faretable" (
   PRIMARY KEY ("station1", "station2")
 );
 
-CREATE INDEX "idx_faretable__station2" ON "faretable" ("station2");
+CREATE INDEX "idx_faretable__stations" ON "faretable" ("station1", "station2");
 
 ALTER TABLE "faretable" ADD CONSTRAINT "fk_faretable__station1" FOREIGN KEY ("station1") REFERENCES "station" ("id");
 
@@ -32,9 +34,7 @@ CREATE TABLE "train" (
   "name" TEXT NOT NULL
 );
 
-CREATE INDEX "idx_train__destination" ON "train" ("destination");
-
-CREATE INDEX "idx_train__source" ON "train" ("source");
+CREATE INDEX "idx_train__trainno" ON "train" ("train_number");
 
 ALTER TABLE "train" ADD CONSTRAINT "fk_train__destination" FOREIGN KEY ("destination") REFERENCES "station" ("id");
 
@@ -45,10 +45,13 @@ CREATE TABLE "availability" (
   "travel_date" DATE NOT NULL,
   "station" TEXT NOT NULL,
   "seats" INTEGER NOT NULL,
-  PRIMARY KEY ("train", "travel_date", "station")
+  PRIMARY KEY ("train", "travel_date", "station"),
+  CHECK (seats > 0)
 );
 
 CREATE INDEX "idx_availability__station" ON "availability" ("station");
+
+CREATE INDEX "idx_availability__search" ON "availability" ("train", "travel_date", "station");
 
 ALTER TABLE "availability" ADD CONSTRAINT "fk_availability__station" FOREIGN KEY ("station") REFERENCES "station" ("id");
 
@@ -65,6 +68,10 @@ CREATE TABLE "route" (
 
 CREATE INDEX "idx_route__station" ON "route" ("station");
 
+CREATE INDEX "idx_route__tst" ON "route" ("train", "station");
+
+CREATE INDEX "idx_route__train" ON "route" ("train");
+
 ALTER TABLE "route" ADD CONSTRAINT "fk_route__station" FOREIGN KEY ("station") REFERENCES "station" ("id");
 
 ALTER TABLE "route" ADD CONSTRAINT "fk_route__train" FOREIGN KEY ("train") REFERENCES "train" ("train_number");
@@ -74,6 +81,8 @@ CREATE TABLE "users" (
   "name" TEXT NOT NULL,
   "password" TEXT NOT NULL
 );
+
+CREATE INDEX "idx_users__username" ON "users" ("username");
 
 CREATE TABLE "ticket" (
   "pnr" SERIAL PRIMARY KEY,
@@ -87,6 +96,8 @@ CREATE TABLE "ticket" (
 CREATE INDEX "idx_ticket__destination" ON "ticket" ("destination");
 
 CREATE INDEX "idx_ticket__source" ON "ticket" ("source");
+
+CREATE INDEX "idx_ticket__pnr" ON "ticket" ("pnr");
 
 CREATE INDEX "idx_ticket__train" ON "ticket" ("train");
 

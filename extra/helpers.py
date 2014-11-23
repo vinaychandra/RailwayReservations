@@ -10,10 +10,11 @@ from datetime import *
 
 fake = Factory.create()
 
-NUMBER_OF_TRAINS= 50
+NUMBER_OF_TRAINS= 150
 RESERVED_FOR_DAYS = 30
-NUMBER_OF_USERS = 10000
+NUMBER_OF_USERS = 100000
 NUMBER_OF_STATIONS = 200
+TICKETS_FOR_TRAIN = 500
 #Note that total number of journeys = reserved_for_days*number_of_trains
 
 #Variable for this session...
@@ -114,27 +115,41 @@ def create_availability():
 
 		start_date = date.today()
 		for single_date in (start_date + timedelta(n) for n in range(RESERVED_FOR_DAYS)):
-			return_list.append(tuple(table.insert(columns=[table.station,table.seats,table.train,table.travel_date], values=[[place,100,train,str(single_date)] for place in route[1:]])))
+			return_list.append(tuple(table.insert(columns=[table.station,table.seats,table.train,table.travel_date], values=[[place,TICKETS_FOR_TRAIN,train,str(single_date)] for place in route[1:]])))
 	return return_list
 
 def create_tickets():
 	ticket_sql = []
 	person_sql = []
 	avail_sql = []
-	person_table = Table('person')
+	person_table = Table('people')
 	ticket_table = Table('ticket')
 	avail_table  = Table('availability')
 
-	for user in usernames:
+	start_date = date.today()
+
+	pnr = 0
+	noTrains = 0
+	for train in list_routes:
+		noTrains += 1
 		for single_date in (start_date + timedelta(n) for n in range(RESERVED_FOR_DAYS)):
-			if randrange(10) < 4 :
-				train = choice(list_routes)
+			ntks = randrange(TICKETS_FOR_TRAIN - 10)
+			tks_booked = 0
+			while tks_booked < ntks :
+				pnr += 1
+				nop = randrange(4) + 1
+				tks_booked += nop
 				src,dst = choice(list(combinations(train[1],2)))
-				ticket_sql.append(tuple(ticket_table.insert(columns=[\
-					ticket_table.journey_train,ticket_table.journey_date,ticket_table.src,ticket_table.dest,ticket_table.user],\
-					values=[train[0],single_date,src,dst,user])))
+				user = choice(usernames)
+
+				ticket_sql.append(tuple(ticket_table.insert(columns=[ticket_table.pnr, ticket_table.train,ticket_table.date,ticket_table.source,ticket_table.destination,ticket_table.username],values=[[pnr,train[0],single_date,src,dst,user]])))
 				route_for_user = train[1][train[1].index(src)+1:train[1].index(dst)+1]
 				for stop in route_for_user:
-					avail_sql.append(tuple(avail_table.update(columns=\
-						[avail_table.station,avail_table.seats,avail_table.journey_train,avail_table.journey_date],\
-						values=[])))
+					avail_sql.append(tuple(avail_table.update(columns=[avail_table.station,avail_table.seats,avail_table.train,avail_table.travel_date],values=[stop, avail_table.seats - nop,train[0],single_date], where=(avail_table.station==stop) & (avail_table.train == train[0]) & (avail_table.travel_date == single_date))))
+				for np in range(nop):
+					name = fake.name().encode('ascii','ignore')
+					val = randrange(80)+5
+					ch = choice(['male','female'])
+					person_sql.append(tuple(person_table.insert(columns=[person_table.name, person_table.age, person_table.gender, person_table.ticket], values=[[name, val, ch, pnr]])))
+		print noTrains, " Completed"
+	return ticket_sql,person_sql,avail_sql

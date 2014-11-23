@@ -53,11 +53,11 @@
       </div>
       <div class="modal-body">
         <form role="form">
-          <div class="form-group">
+          <div class="form-group" id="l1">
             <label for="loginEmail">Username</label>
             <input type="email" class="form-control" id="loginEmail" placeholder="Enter username">
           </div>
-          <div class="form-group">
+          <div class="form-group" id="l2">
             <label for="loginPassword">Password</label>
             <input type="password" class="form-control" id="loginPassword" placeholder="Password">
           </div>
@@ -91,11 +91,11 @@
             <label for="signupUsername">Username</label>
             <input type="email" class="form-control" id="signupUsername" placeholder="Enter username">
           </div>
-          <div class="form-group">
+          <div class="form-group" id="c1">
             <label for="signupPassword1">Password</label>
             <input type="password" class="form-control" id="signupPassword1" placeholder="Password">
           </div>
-          <div class="form-group">
+          <div class="form-group" id="c2">
             <label for="signupPassword2">Re-enter Password</label>
             <input type="password" class="form-control" id="signupPassword2" placeholder="Password">
           </div>
@@ -109,7 +109,10 @@
   </div>
 </div>
 
-
+<div class="page-header" style="text-align: center;"><h1>Railway Reservation Site <small>CS 387</small></h1></div>
+<div style="text-align: center;"><h3>Vinay Chandra Dommeti</h3></div>
+<div style="text-align: center;"><h3>Harish Koilada</h3></div>
+<div style="text-align: center;"><h3>Nikhil Sri Ram Dodda</h3></div>
 </body>
 <script src="js/jquery-2.1.1.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
@@ -127,21 +130,29 @@
         window.location.replace(data['redirect']);
       } else if(data['error']){
         console.log(data['error']);
-        $("#loginModal").modal('toggle');
+        $("#l1").addClass("has-error");
+        $("#l2").addClass("has-error");
       } else console.log("Unknown error");
     });
   }
 
   $("#signupbtn").click(function() {
-    $.post("signup",
-            {
-              name: $("#signupName").val(),
-              uname: $("#signupUsername").val(),
-              pwd: $("#signupPassword1").val()
-            },
-    function(data){
-      window.location.href = data;
-    })
+    var sp1 = $("#signupPassword1");
+    if(sp1.val() != $("#signupPassword2").val()) {
+      $("#c1").addClass("has-error");
+      $("#c2").addClass("has-error");
+    }
+    else {
+      $.post("signup",
+              {
+                name: $("#signupName").val(),
+                uname: $("#signupUsername").val(),
+                pwd: sp1.val()
+              },
+              function (data) {
+                window.location.href = data;
+              })
+    }
   })
 </script>
 </HTML>

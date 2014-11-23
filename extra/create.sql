@@ -46,7 +46,7 @@ CREATE TABLE "availability" (
   "station" TEXT NOT NULL,
   "seats" INTEGER NOT NULL,
   PRIMARY KEY ("train", "travel_date", "station"),
-  CHECK (seats > 0)
+  CHECK (seats >= 0)
 );
 
 CREATE INDEX "idx_availability__station" ON "availability" ("station");

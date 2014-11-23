@@ -51,6 +51,28 @@ for sql in avail_sql:
 	cursor.execute(sql[0],sql[1])
 print "Done"
 
+print "Creating tickets..."
+ticket_sql,person_sql,avail_sql = create_tickets()
+print "Ready to adjust database"
+print "\tPopulating tickets...",
+flush()
+for sql in ticket_sql:
+	cursor.execute(sql[0],sql[1])
+print "Done"
+print "\tPopulating travellers...",
+flush()
+for sql in person_sql:
+	cursor.execute(sql[0],sql[1])
+print "Done"
+print "\tAdjusting availability table...",
+flush()
+for sql in avail_sql:
+	try:
+		cursor.execute(sql[0],sql[1])
+	except Exception:
+		pass
+print "Done"
+
 print "Closing database...",
 flush()
 conn.commit()

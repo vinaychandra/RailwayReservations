@@ -62,11 +62,13 @@ public class trainDetail extends HttpServlet {
             preparedStatement.setString(4,destination);
             preparedStatement.setString(6,source);
 
+
             for (int i = 0; i < 7; i++) {
 
                 Date ndate = new Date(c.getTimeInMillis());
 
                 preparedStatement.setDate(2, ndate);
+
 
                 ResultSet resultSet = preparedStatement.executeQuery();
                 if(resultSet.next()) {
@@ -83,6 +85,7 @@ public class trainDetail extends HttpServlet {
                     writer.print("</td>");
 
                     writer.print("<td>");
+                    System.out.println(val);
                     if (val > 0)
                         writer.print("<a onclick='book(\""+source+"\",\""+destination+"\",\""+ndate+"\",\""+trainNo+"\")'>Book</a>");
                     else

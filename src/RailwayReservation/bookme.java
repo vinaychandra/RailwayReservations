@@ -44,6 +44,7 @@ public class bookme extends HttpServlet {
         String dst = request.getParameter("dst");
         String tno = request.getParameter("tno");
         String doj = request.getParameter("doj");
+        String errorMsg = null;
 
         try {
             conn.setAutoCommit(false);
@@ -127,7 +128,33 @@ public class bookme extends HttpServlet {
                 number_created++;
             }
 
-            if(number_created == 0) throw new SQLException();
+            if(number_created == 0){
+                errorMsg = "No passengers mentioned";
+                throw new SQLException();
+            }
+
+            String sql = "select MIN(seats) as val from availability where train = ? and travel_date = ? and station in (select station from route where train = ? and stopnum <= (select stopnum from route where station = ? and train = ?) and stopnum > (select stopnum from route where station = ? and train = ?))";
+
+            preparedStatement = conn.prepareStatement(sql);
+            preparedStatement.setInt(1, Integer.parseInt(tno));
+            preparedStatement.setInt(3, Integer.parseInt(tno));
+            preparedStatement.setInt(5, Integer.parseInt(tno));
+            preparedStatement.setInt(7, Integer.parseInt(tno));
+            preparedStatement.setString(4,dst);
+            preparedStatement.setString(6,src);
+            preparedStatement.setDate(2,Date.valueOf(doj));
+
+            ResultSet resultSet1 = preparedStatement.executeQuery();
+            resultSet1.next();
+            int val = resultSet1.getInt("val");
+
+            if (val < number_created){
+                errorMsg = "More passengers than we can accommodate";
+                throw new SQLException();
+            }
+
+            System.out.println(val);
+            System.out.println(number_created);
 
             /*update the availabilities*/
             preparedStatement2.setInt(1, number_created);
@@ -147,9 +174,9 @@ public class bookme extends HttpServlet {
 
         }catch (SQLException se) {
             try {
-                se.printStackTrace();
+                se.printStackTrace(); //Commented because this is used like a feature rather than error
                 conn.rollback();
-                response.sendRedirect("failed.jsp");
+                response.sendRedirect("failed.jsp?q="+errorMsg);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
